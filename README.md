@@ -1,4 +1,4 @@
-# TM1637 7-Segment Display Driver for ESP-IDF
+# TM1637 7-Segment Display Driver for ESP8266_RTOS_SDK
 
 A comprehensive ESP-IDF component for controlling TM1637-based 7-segment LED displays. This driver provides full control over brightness, display content, and includes advanced features like text scrolling.
 
@@ -15,30 +15,44 @@ A comprehensive ESP-IDF component for controlling TM1637-based 7-segment LED dis
 
 ## Hardware Connection
 
-| TM1637 Pin | ESP32 Pin | Description  |
-| ---------- | --------- | ------------ |
-| VCC        | 3.3V/5V   | Power supply |
-| GND        | GND       | Ground       |
-| CLK        | Any GPIO  | Clock signal |
-| DIO        | Any GPIO  | Data I/O     |
+| TM1637 Pin | ESP8266 Pin | Description  |
+| ---------- | ----------- | ------------ |
+| VCC        | 3.3V/5V     | Power supply |
+| GND        | GND         | Ground       |
+| CLK        | Any GPIO    | Clock signal |
+| DIO        | Any GPIO    | Data I/O     |
 
-**Note:** External pull-up resistors (4.7kΩ - 10kΩ) are recommended on CLK and DIO pins for reliable operation.
+**Note:** External pull-up resistors (4.7kΩ - 10kΩ) are recommended on CLK and DIO pins for reliable operation. On ESP8266 only GPIO 0-15 are usable; GPIO 6-11 are reserved for the SPI flash, so avoid them for CLK/DIO.
 
 ## Installation
 
-### Using ESP Component Registry (Recommended)
+For ESP8266-RTOS-SDK projects, add this component as a git submodule under your
+project's `components/` directory:
 
 ```bash
-idf.py add-dependency "heronet/tm1637^1.0.0"
+cd <your-project>
+git submodule add -b esp8266 https://github.com/larryli/esp-idf-tm1637.git components/tm1637
+git submodule update --init --recursive
 ```
 
-### Manual Installation
+ESP8266-RTOS-SDK automatically discovers any component placed in `components/`,
+so no further configuration is needed. Then simply `#include "tm1637.h"` in your
+application.
 
-Clone this repository into your project's `components` directory:
+## ESP8266 Build Notes
 
-```bash
-cd your_project/components
-git clone https://github.com/heronet/esp-idf-tm1637.git tm1637
+One linker workaround is required on ESP8266-RTOS-SDK v3.4 because of a bug in the SDK's
+`pthread` component: its `CMakeLists.txt` forces `-u pthread_include_pthread_cond_impl`,
+but the symbol actually defined is `pthread_include_pthread_cond_var_impl`. As a result the
+condition-variable code (which provides `pthread_cond_init`) is dropped by `--gc-sections`
+and the default `libstdc++` fails to link with
+`undefined reference to pthread_cond_init`.
+
+Add the following to your project's `CMakeLists.txt`, **after** `project()`:
+
+```cmake
+target_link_libraries(${CMAKE_PROJECT_NAME}.elf
+    "-Wl,--undefined=pthread_include_pthread_cond_var_impl")
 ```
 
 ## Quick Start
@@ -50,8 +64,8 @@ void app_main(void)
 {
     // Configure pins
     tm1637_config_t config = {
-        .clk_pin = GPIO_NUM_18,
-        .dio_pin = GPIO_NUM_19,
+        .clk_pin = GPIO_NUM_14,
+        .dio_pin = GPIO_NUM_12,
         .bit_delay_us = 100
     };
 
@@ -328,8 +342,8 @@ uint8_t tm1637_encode_digit(uint8_t digit);
 
 void app_main(void) {
     tm1637_config_t config = {
-        .clk_pin = GPIO_NUM_18,
-        .dio_pin = GPIO_NUM_19,
+        .clk_pin = GPIO_NUM_14,
+        .dio_pin = GPIO_NUM_12,
         .bit_delay_us = 100
     };
 
@@ -379,7 +393,6 @@ void display_time(tm1637_handle_t display, int hour, int minute) {
 ```
 tm1637/
 ├── CMakeLists.txt
-├── idf_component.yml
 ├── LICENSE
 ├── README.md
 ├── include/

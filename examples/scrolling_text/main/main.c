@@ -17,8 +17,8 @@
 static const char *TAG = "SCROLL_EXAMPLE";
 
 // Define your GPIO pins
-#define TM1637_CLK_PIN GPIO_NUM_18
-#define TM1637_DIO_PIN GPIO_NUM_19
+#define TM1637_CLK_PIN GPIO_NUM_14
+#define TM1637_DIO_PIN GPIO_NUM_12
 
 void app_main(void)
 {
@@ -50,7 +50,7 @@ void app_main(void)
 
     // Example 2: Blocking scroll with faster speed
     ESP_LOGI(TAG, "Example 2: Fast scroll");
-    tm1637_scroll_text(display, "ESP32 TM1637 DRIVER", 200);
+    tm1637_scroll_text(display, "ESP8266 TM1637 DRIVER", 200);
 
     vTaskDelay(pdMS_TO_TICKS(1000));
 
@@ -74,7 +74,7 @@ void app_main(void)
 
     // Example 4: One-time non-blocking scroll
     ESP_LOGI(TAG, "Example 4: One-time scroll (no loop)");
-    tm1637_scroll_start(display, "WELCOME TO ESP32", 300, false);
+    tm1637_scroll_start(display, "WELCOME TO ESP8266", 300, false);
 
     // Wait for it to finish
     vTaskDelay(pdMS_TO_TICKS(8000));

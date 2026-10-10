@@ -19,8 +19,8 @@
 static const char *TAG = "EXAMPLE";
 
 // Define your GPIO pins
-#define TM1637_CLK_PIN GPIO_NUM_18
-#define TM1637_DIO_PIN GPIO_NUM_19
+#define TM1637_CLK_PIN GPIO_NUM_14
+#define TM1637_DIO_PIN GPIO_NUM_12
 
 void app_main(void)
 {

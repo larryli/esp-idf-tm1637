@@ -1,6 +1,0 @@
-description: 'TM1637 text scrolling example'
-dependencies:
-  idf: '>=4.4'
-  heronet/tm1637:
-    version: '*'
-    override_path: '../../../'
